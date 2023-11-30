@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -35,31 +36,29 @@ void insert(TrieNode* root, string key) {
   pCrawl->isEndOfWord = true;
 }
 
-bool isLeafNode(TrieNode* root)
-{
-  return root->isEndOfWord != false;
+bool isLeafNode(TrieNode* root) { return root->isEndOfWord != false; }
+
+TrieNode* moveRoot(TrieNode* root, char str[]) {
+  TrieNode* toReturn = root;
+
+  for (size_t i = 0; i < strlen(str); i++) {
+    toReturn = toReturn->children[str[i] - 'a'];
+  }
+  return toReturn;
 }
 
-void display(TrieNode* root, char str[], int level)
-{
-  // If node is leaf node, it indicates end
-  // of string, so a null character is added
-  // and string is displayed
-  if (isLeafNode(root))
-  {
+void display(TrieNode* root, char str[], int level) {
+  if (isLeafNode(root)) {
     str[level] = '\0';
-    cout << str << endl;
+    for (int i = strlen(str) - 1; i >= 0; i--) {
+      cout << str[i];
+    }
+    cout << endl;
   }
 
   int i;
-  for (i = 0; i < ALPHABET_SIZE; i++)
-  {
-    // if NON NULL child is found
-    // add parent key to str and
-    // call the display function recursively
-    // for child node
-    if (root->children[i])
-    {
+  for (i = 0; i < ALPHABET_SIZE; i++) {
+    if (root->children[i]) {
       str[level] = i + 'a';
       display(root->children[i], str, level + 1);
     }
@@ -69,8 +68,6 @@ void display(TrieNode* root, char str[], int level)
 int main() {
   ifstream fin("input.txt");
 
-  //string test = "catt";
-
   TrieNode* root = initNode();
   string temp = "";
 
@@ -79,19 +76,23 @@ int main() {
     if (c == ' ') {
       insert(root, temp);
       temp = "";
-    }
-    else {
+    } else {
       temp = c + temp;
     }
   }
-  int level = 0;
-  char str[20];
 
-  // Displaying content of Trie
+  char str[15];
+
+  cout << "Enter the end of the word: ";
+  cin >> str;
+
+  std::reverse(str, str + strlen(str));
+
+  int level = strlen(str);
+  TrieNode* temp_tr = moveRoot(root, str); // куда деть?
+
   cout << "Content of Trie: " << endl;
-  display(root, str, level);
-
-  //insert(root, test);
+  display(temp_tr, str, level);
 
   fin.close();
 }
